@@ -60,12 +60,30 @@
         }
         
         .game-header {
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.7);
             width: 100%;
             padding: 15px;
             display: flex;
             justify-content: space-around;
             border-bottom: 3px solid #f39c12;
+            align-items: center;
+        }
+        
+        .timer {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #f39c12;
+            animation: pulse-timer 1s infinite;
+        }
+        
+        .timer.warning {
+            color: #e74c3c;
+            animation: pulse-timer 0.5s infinite;
+        }
+        
+        @keyframes pulse-timer {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
         
         .game-header span {
@@ -136,15 +154,60 @@
             font-size: 1.3rem;
         }
         
-        .monster {
-            font-size: 3rem;
-            margin: 15px 0;
-            animation: bounce 0.6s ease-in-out infinite;
+        .character {
+            font-size: 4rem;
+            margin: 10px 0;
+            animation: bounce 1s ease-in-out infinite;
+            filter: drop-shadow(0 0 10px rgba(243, 156, 18, 0.5));
+        }
+        
+        .character.attack {
+            animation: attack 0.6s ease-out;
+        }
+        
+        .character.hit {
+            animation: hit 0.4s ease-out;
         }
         
         @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
+        }
+        
+        @keyframes attack {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(-5deg) translateX(-10px); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        
+        @keyframes hit {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.05) translateX(-5px); }
+            50% { transform: scale(1.05) translateX(5px); }
+            75% { transform: scale(1.05) translateX(-5px); }
+            100% { transform: scale(1); }
+        }
+        
+        .hp-bar-container {
+            width: 100%;
+            max-width: 250px;
+            height: 20px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #f39c12;
+            margin: 10px 0;
+        }
+        
+        .hp-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            width: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        .hp-bar.critical {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
         }
         
         .question {
@@ -306,6 +369,29 @@
         
         /* 隱藏 */
         .hidden { display: none !important; }
+
+        /* 音樂按鈕 */
+        .music-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.5);
+            border: 2px solid #f39c12;
+            color: white;
+            font-size: 1.5rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .music-toggle:hover {
+            background: rgba(0,0,0,0.7);
+        }
     </style>
 </head>
 <body>
@@ -315,13 +401,15 @@
     <div id="start-screen" class="screen active">
         <h1>🎮 四則運算大對戰</h1>
         <p>挑戰你的計算能力！</p>
-        <p style="font-size: 1rem; opacity: 0.8;">雙人即時對戰 - 先擊敗對手贏得勝利</p>
+        <p style="font-size: 1rem; opacity: 0.8;">⏱️ 限時90秒 - 雙人即時對戰 - 先擊敗對手贏得勝利</p>
         <button class="btn-primary" onclick="startGame()">⚔️ 開始對戰</button>
     </div>
 
     <!-- 遊戲畫面 -->
     <div id="game-screen" class="screen">
+        <button class="music-toggle" onclick="toggleMusic()" id="music-btn">🔊</button>
         <div class="game-header">
+            <div>⏱️ 時間: <span id="timer" class="timer">90</span>秒</div>
             <div>騎士 (P1) - HP: <span id="hp1">100</span> | 分數: <span id="score1">0</span></div>
             <div>法師 (P2) - HP: <span id="hp2">100</span> | 分數: <span id="score2">0</span></div>
         </div>
@@ -330,7 +418,10 @@
                 <div class="player-header">
                     <h2>⚔️ 騎士 (P1)</h2>
                 </div>
-                <div class="monster" id="monster1">👦</div>
+                <div class="character" id="char1">🗡️</div>
+                <div class="hp-bar-container">
+                    <div class="hp-bar" id="hp-bar1" style="width: 100%;"></div>
+                </div>
                 <div class="question" id="question1">載入中...</div>
                 <div class="numpad" id="numpad1"></div>
             </div>
@@ -339,7 +430,10 @@
                 <div class="player-header">
                     <h2>🧙 法師 (P2)</h2>
                 </div>
-                <div class="monster" id="monster2">👧</div>
+                <div class="character" id="char2">🪄</div>
+                <div class="hp-bar-container">
+                    <div class="hp-bar" id="hp-bar2" style="width: 100%;"></div>
+                </div>
                 <div class="question" id="question2">載入中...</div>
                 <div class="numpad" id="numpad2"></div>
             </div>
@@ -357,11 +451,13 @@
                         <h3>⚔️ 騎士 (P1)</h3>
                         <p>HP: <span id="final-hp1">0</span></p>
                         <p>分數: <span id="final-score1">0</span></p>
+                        <p>答對: <span id="final-correct1">0</span></p>
                     </div>
                     <div class="player-result">
                         <h3>🧙 法師 (P2)</h3>
                         <p>HP: <span id="final-hp2">0</span></p>
                         <p>分數: <span id="final-score2">0</span></p>
+                        <p>答對: <span id="final-correct2">0</span></p>
                     </div>
                 </div>
             </div>
@@ -370,7 +466,12 @@
     </div>
 </div>
 
+<audio id="background-music" loop volume="0.5">
+    <source src="data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAAB9AAACABAAZGF0YQIAAAAAAA==" type="audio/wav">
+</audio>
+
 <script>
+    // 完整的100題題庫
     const questions = [
         { q: "125 + 48 ÷ 4 = ?", a: 137 },
         { q: "(350 - 50) ÷ 6 = ?", a: 50 },
@@ -401,33 +502,162 @@
         { q: "60 × 3 + 120 = ?", a: 300 },
         { q: "99 + 1 - 50 = ?", a: 50 },
         { q: "300 ÷ 3 + 100 = ?", a: 200 },
-        { q: "10 × 10 - 50 = ?", a: 50 }
+        { q: "10 × 10 - 50 = ?", a: 50 },
+        { q: "144 ÷ 12 × 5 = ?", a: 60 },
+        { q: "(200 + 100) ÷ 6 = ?", a: 50 },
+        { q: "88 - 33 + 45 = ?", a: 100 },
+        { q: "256 ÷ 16 + 64 = ?", a: 80 },
+        { q: "7 × 8 + 36 = ?", a: 92 },
+        { q: "120 ÷ 6 + 30 = ?", a: 50 },
+        { q: "50 + 50 × 2 = ?", a: 150 },
+        { q: "(999 - 999) + 42 = ?", a: 42 },
+        { q: "100 - 25 + 50 = ?", a: 125 },
+        { q: "15 + 15 + 15 + 15 = ?", a: 60 },
+        { q: "200 ÷ 4 - 25 = ?", a: 25 },
+        { q: "48 ÷ 6 × 9 = ?", a: 72 },
+        { q: "55 + 45 ÷ 9 = ?", a: 60 },
+        { q: "(100 + 50) ÷ 2 = ?", a: 75 },
+        { q: "32 × 3 - 16 = ?", a: 80 },
+        { q: "180 ÷ 9 + 20 = ?", a: 40 },
+        { q: "99 ÷ 9 + 1 = ?", a: 12 },
+        { q: "15 × 4 ÷ 2 = ?", a: 30 },
+        { q: "76 - 26 + 50 = ?", a: 100 },
+        { q: "128 ÷ 8 - 6 = ?", a: 10 },
+        { q: "13 × 8 - 4 = ?", a: 100 },
+        { q: "91 ÷ 7 + 3 = ?", a: 16 },
+        { q: "40 × 2 + 20 = ?", a: 100 },
+        { q: "84 ÷ 12 × 18 = ?", a: 126 },
+        { q: "120 + 80 ÷ 4 = ?", a: 140 },
+        { q: "(60 + 40) × 2 = ?", a: 200 },
+        { q: "100 ÷ 5 × 3 = ?", a: 60 },
+        { q: "11 × 9 + 1 = ?", a: 100 },
+        { q: "75 ÷ 3 + 25 = ?", a: 50 },
+        { q: "24 × 4 + 4 = ?", a: 100 },
+        { q: "999 ÷ 9 - 1 = ?", a: 110 },
+        { q: "50 × 2 - 50 = ?", a: 50 },
+        { q: "160 ÷ 16 + 80 = ?", a: 90 },
+        { q: "22 × 4 + 12 = ?", a: 100 },
+        { q: "63 ÷ 9 × 12 = ?", a: 84 },
+        { q: "(45 + 45) + 10 = ?", a: 100 },
+        { q: "72 ÷ 8 + 58 = ?", a: 67 },
+        { q: "30 × 3 + 10 = ?", a: 100 },
+        { q: "100 + 100 ÷ 2 = ?", a: 150 },
+        { q: "96 ÷ 12 × 5 = ?", a: 40 },
+        { q: "55 × 2 - 10 = ?", a: 100 },
+        { q: "210 ÷ 7 + 30 = ?", a: 60 },
+        { q: "88 ÷ 8 + 12 = ?", a: 23 },
+        { q: "25 + 25 × 2 = ?", a: 75 },
+        { q: "450 ÷ 9 + 50 = ?", a: 100 },
+        { q: "64 ÷ 4 - 6 = ?", a: 10 },
+        { q: "20 × 5 + 50 = ?", a: 150 },
+        { q: "324 ÷ 18 + 64 = ?", a: 82 },
+        { q: "70 + 30 ÷ 3 = ?", a: 80 },
+        { q: "(70 + 30) - 20 = ?", a: 80 },
+        { q: "105 ÷ 7 + 60 = ?", a: 75 },
+        { q: "42 × 2 + 16 = ?", a: 100 },
+        { q: "360 ÷ 12 + 40 = ?", a: 70 },
+        { q: "56 ÷ 7 × 10 = ?", a: 80 },
+        { q: "33 + 67 ÷ 1 = ?", a: 100 },
+        { q: "480 ÷ 16 + 50 = ?", a: 80 },
+        { q: "39 × 2 + 22 = ?", a: 100 },
+        { q: "400 ÷ 20 + 60 = ?", a: 80 },
+        { q: "150 - 50 + 50 = ?", a: 150 },
+        { q: "68 - 18 + 50 = ?", a: 100 },
+        { q: "100 × 1 + 0 = ?", a: 100 },
+        { q: "999 - 899 = ?", a: 100 },
+        { q: "52 × 2 - 4 = ?", a: 100 }
     ];
 
-    let p1Data = { hp: 100, score: 0, combo: 0, correctCount: 0 };
-    let p2Data = { hp: 100, score: 0, combo: 0, correctCount: 0 };
+    let p1Data = { hp: 100, score: 0, correctCount: 0 };
+    let p2Data = { hp: 100, score: 0, correctCount: 0 };
     let usedQuestions = new Set();
+    let gameActive = true;
+    let timeRemaining = 90;
+    let musicEnabled = false;
+    let gameTimer = null;
+
+    // 創建簡單的遊戲音樂 (8-bit風格)
+    function createGameMusic() {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const notes = [262, 294, 330, 349, 392, 440]; // C, D, E, F, G, A
+        
+        const playNote = (freq, duration, time) => {
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            osc.frequency.value = freq;
+            osc.type = 'square';
+            gain.gain.setValueAtTime(0.3, time);
+            gain.gain.exponentialRampToValueAtTime(0.01, time + duration);
+            osc.start(time);
+            osc.stop(time + duration);
+        };
+        
+        let time = audioContext.currentTime;
+        for (let i = 0; i < 20; i++) {
+            const noteIndex = Math.floor(Math.random() * notes.length);
+            playNote(notes[noteIndex], 0.1, time);
+            time += 0.1;
+        }
+    }
+
+    function toggleMusic() {
+        musicEnabled = !musicEnabled;
+        const btn = document.getElementById('music-btn');
+        btn.innerText = musicEnabled ? '🔊' : '🔇';
+        if (musicEnabled) {
+            try {
+                createGameMusic();
+            } catch (e) {
+                console.log('音樂播放失敗');
+            }
+        }
+    }
 
     function startGame() {
         document.getElementById('start-screen').classList.remove('active');
         document.getElementById('game-screen').classList.add('active');
+        gameActive = true;
+        timeRemaining = 90;
+        
+        // 開始倒計時
+        gameTimer = setInterval(() => {
+            timeRemaining--;
+            const timerEl = document.getElementById('timer');
+            timerEl.innerText = timeRemaining;
+            
+            if (timeRemaining <= 10) {
+                timerEl.classList.add('warning');
+            }
+            
+            if (timeRemaining <= 0) {
+                endGame();
+            }
+        }, 1000);
+        
+        // 播放遊戲音樂
+        if (musicEnabled) {
+            try {
+                createGameMusic();
+            } catch (e) {}
+        }
+        
         loadQuestion(1);
         loadQuestion(2);
     }
 
     function loadQuestion(p) {
+        if (!gameActive) return;
+        
         let q;
         let attempts = 0;
         do {
             q = questions[Math.floor(Math.random() * questions.length)];
             attempts++;
-        } while (usedQuestions.has(q.a) && attempts < 10 && usedQuestions.size < 30);
+        } while (usedQuestions.has(q.a) && attempts < 10 && usedQuestions.size < 100);
 
-        if (attempts >= 10 || usedQuestions.size >= 30) {
-            if (p1Data.hp <= 0 || p2Data.hp <= 0) {
-                endGame();
-                return;
-            }
+        if (attempts >= 10 || usedQuestions.size >= 100) {
             usedQuestions.clear();
             q = questions[Math.floor(Math.random() * questions.length)];
         }
@@ -437,7 +667,7 @@
         
         const options = [q.a];
         while (options.length < 4) {
-            const fake = Math.floor(Math.random() * 300) + 1;
+            const fake = Math.floor(Math.random() * 500) + 1;
             if (!options.includes(fake)) options.push(fake);
         }
         options.sort(() => Math.random() - 0.5);
@@ -454,32 +684,36 @@
     }
 
     function checkAnswer(p, userA, realA, btn) {
+        if (!gameActive) return;
+        
         const data = p === 1 ? p1Data : p2Data;
         const otherData = p === 1 ? p2Data : p1Data;
+        const charEl = document.getElementById('char' + p);
         
         if (userA === realA) {
             btn.classList.add('correct');
-            data.score += 100;
-            data.combo++;
+            data.score += 50;
             data.correctCount++;
-            if (data.combo % 3 === 0) {
-                data.hp = Math.min(100, data.hp + 20);
-                otherData.hp = Math.max(0, otherData.hp - 10);
-            } else {
-                otherData.hp = Math.max(0, otherData.hp - 5);
-            }
+            charEl.classList.add('attack');
+            // 答對不回血，只是增加分數
+            otherData.hp = Math.max(0, otherData.hp - 15);
         } else {
             btn.classList.add('wrong');
-            data.hp = Math.max(0, data.hp - 15);
-            data.combo = 0;
+            data.hp = Math.max(0, data.hp - 20);
+            charEl.classList.add('hit');
         }
 
         updateUI();
 
         if (data.hp <= 0 || otherData.hp <= 0) {
+            gameActive = false;
+            clearInterval(gameTimer);
             setTimeout(endGame, 800);
         } else {
-            setTimeout(() => loadQuestion(p), 1000);
+            setTimeout(() => {
+                charEl.classList.remove('attack', 'hit');
+                loadQuestion(p);
+            }, 1000);
         }
     }
 
@@ -488,19 +722,33 @@
         document.getElementById('score1').innerText = p1Data.score;
         document.getElementById('hp2').innerText = p2Data.hp;
         document.getElementById('score2').innerText = p2Data.score;
+        
+        // 更新HP條
+        const hpPercent1 = Math.max(0, p1Data.hp) / 100 * 100;
+        const hpPercent2 = Math.max(0, p2Data.hp) / 100 * 100;
+        document.getElementById('hp-bar1').style.width = hpPercent1 + '%';
+        document.getElementById('hp-bar2').style.width = hpPercent2 + '%';
+        
+        if (p1Data.hp <= 30) document.getElementById('hp-bar1').classList.add('critical');
+        if (p2Data.hp <= 30) document.getElementById('hp-bar2').classList.add('critical');
     }
 
     function endGame() {
+        gameActive = false;
+        clearInterval(gameTimer);
         document.getElementById('game-screen').classList.remove('active');
         document.getElementById('end-screen').classList.add('active');
 
-        let winner = p1Data.hp > p2Data.hp ? "⚔️ 騎士 (P1) 獲勝！" : "🧙 法師 (P2) 獲勝！";
+        let winner = p1Data.hp > p2Data.hp ? "⚔️ 騎士 (P1) 獲勝！" : p2Data.hp > p1Data.hp ? "🧙 法師 (P2) 獲勝！" : "⚔️ 平手！";
         document.getElementById('winner').innerText = winner;
         
-        document.getElementById('final-hp1').innerText = p1Data.hp;
+        document.getElementById('final-hp1').innerText = Math.max(0, p1Data.hp);
         document.getElementById('final-score1').innerText = p1Data.score;
-        document.getElementById('final-hp2').innerText = p2Data.hp;
+        document.getElementById('final-correct1').innerText = p1Data.correctCount;
+        
+        document.getElementById('final-hp2').innerText = Math.max(0, p2Data.hp);
         document.getElementById('final-score2').innerText = p2Data.score;
+        document.getElementById('final-correct2').innerText = p2Data.correctCount;
     }
 </script>
 </body>
