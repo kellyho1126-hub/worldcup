@@ -36,21 +36,15 @@
         }
         
         #start-screen h1 {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
             text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
         }
         
         #start-screen p {
-            font-size: 1.3rem;
-            margin: 15px 0;
+            font-size: 1rem;
+            margin: 10px 0;
             opacity: 0.9;
-        }
-        
-        .mode-buttons {
-            display: flex;
-            gap: 20px;
-            margin-top: 30px;
         }
         
         /* 遊戲畫面 */
@@ -62,15 +56,16 @@
         .game-header {
             background: rgba(0,0,0,0.7);
             width: 100%;
-            padding: 15px;
+            padding: 8px;
             display: flex;
             justify-content: space-around;
-            border-bottom: 3px solid #f39c12;
+            border-bottom: 2px solid #f39c12;
             align-items: center;
+            font-size: 0.85rem;
         }
         
         .timer {
-            font-size: 2rem;
+            font-size: 1.3rem;
             font-weight: bold;
             color: #f39c12;
             animation: pulse-timer 1s infinite;
@@ -87,14 +82,14 @@
         }
         
         .game-header span {
-            font-size: 1.2rem;
+            font-size: 0.9rem;
             color: #f39c12;
         }
         
         .game-ui { 
             display: flex; 
             width: 100%; 
-            height: calc(100% - 70px);
+            height: calc(100% - 50px);
             gap: 2px;
             background: #000;
         }
@@ -102,12 +97,12 @@
         .player-side { 
             flex: 1; 
             background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            padding: 20px; 
+            padding: 12px; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: space-between;
-            border: 3px solid #3498db;
+            border: 2px solid #3498db;
             position: relative;
             overflow-y: auto;
         }
@@ -122,41 +117,17 @@
         
         .player-header {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
         }
         
         .player-header h2 {
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-        }
-        
-        .player-stats {
-            display: flex;
-            gap: 15px;
-            font-size: 1.1rem;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        .stat {
-            background: rgba(0,0,0,0.3);
-            padding: 8px 12px;
-            border-radius: 5px;
-        }
-        
-        .stat-label {
-            color: #bdc3c7;
-        }
-        
-        .stat-value {
-            color: #f39c12;
-            font-weight: bold;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
         }
         
         .character {
-            font-size: 4rem;
-            margin: 10px 0;
+            font-size: 2.5rem;
+            margin: 5px 0;
             animation: bounce 1s ease-in-out infinite;
             filter: drop-shadow(0 0 10px rgba(243, 156, 18, 0.5));
         }
@@ -171,7 +142,7 @@
         
         @keyframes bounce {
             0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(2deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
         }
         
         @keyframes attack {
@@ -190,13 +161,13 @@
         
         .hp-bar-container {
             width: 100%;
-            max-width: 250px;
-            height: 20px;
+            max-width: 200px;
+            height: 12px;
             background: rgba(0,0,0,0.5);
-            border-radius: 10px;
+            border-radius: 6px;
             overflow: hidden;
-            border: 2px solid #f39c12;
-            margin: 10px 0;
+            border: 1px solid #f39c12;
+            margin: 6px 0;
         }
         
         .hp-bar {
@@ -204,6 +175,7 @@
             background: linear-gradient(90deg, #27ae60, #2ecc71);
             width: 100%;
             transition: width 0.3s ease;
+            font-size: 0.7rem;
         }
         
         .hp-bar.critical {
@@ -211,13 +183,13 @@
         }
         
         .question {
-            font-size: 1.8rem;
+            font-size: 1.2rem;
             font-weight: bold;
-            margin: 20px 0;
+            margin: 10px 0;
             background: rgba(0,0,0,0.3);
-            padding: 15px;
-            border-radius: 10px;
-            min-height: 60px;
+            padding: 8px;
+            border-radius: 8px;
+            min-height: 45px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -227,17 +199,17 @@
         .numpad {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr 1fr;
-            gap: 8px;
+            gap: 4px;
             width: 100%;
-            max-width: 300px;
+            max-width: 250px;
         }
         
         .answer-btn { 
-            padding: 12px; 
-            font-size: 1.2rem; 
+            padding: 8px; 
+            font-size: 0.9rem; 
             cursor: pointer; 
-            border-radius: 8px; 
-            border: 2px solid #3498db;
+            border-radius: 6px; 
+            border: 1px solid #3498db;
             background: #3498db;
             color: white;
             font-weight: bold;
@@ -278,12 +250,12 @@
         }
         
         button { 
-            padding: 15px 30px; 
-            font-size: 1.1rem; 
+            padding: 10px 20px; 
+            font-size: 0.9rem; 
             cursor: pointer; 
-            border-radius: 10px; 
+            border-radius: 8px; 
             border: none; 
-            margin: 10px;
+            margin: 8px;
             font-weight: bold;
             transition: all 0.3s ease;
         }
@@ -299,8 +271,8 @@
         .btn-primary {
             background: #f39c12;
             color: white;
-            font-size: 1.3rem;
-            padding: 20px 50px;
+            font-size: 1.1rem;
+            padding: 15px 35px;
         }
         
         .btn-primary:hover {
@@ -317,54 +289,54 @@
         }
         
         .end-content h1 {
-            font-size: 3rem;
-            margin-bottom: 30px;
+            font-size: 2.2rem;
+            margin-bottom: 15px;
             text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
         }
         
         .end-stats {
             background: rgba(0,0,0,0.3);
-            padding: 30px;
-            border-radius: 15px;
-            margin: 20px auto;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px auto;
             width: 90%;
-            max-width: 500px;
+            max-width: 450px;
         }
         
         .end-stats p {
-            font-size: 1.5rem;
-            margin: 15px 0;
+            font-size: 1.1rem;
+            margin: 8px 0;
         }
         
         .winner-name {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             color: #f39c12;
             font-weight: bold;
-            margin: 20px 0;
+            margin: 12px 0;
         }
         
         .vs-section {
             display: flex;
             justify-content: space-around;
-            margin: 20px 0;
-            gap: 20px;
+            margin: 12px 0;
+            gap: 12px;
         }
         
         .player-result {
             flex: 1;
             background: rgba(0,0,0,0.3);
-            padding: 15px;
-            border-radius: 10px;
+            padding: 10px;
+            border-radius: 8px;
         }
         
         .player-result h3 {
-            font-size: 1.3rem;
-            margin-bottom: 10px;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
         }
         
         .player-result p {
-            font-size: 1.2rem;
-            margin: 5px 0;
+            font-size: 0.85rem;
+            margin: 3px 0;
         }
         
         /* 隱藏 */
@@ -373,14 +345,14 @@
         /* 音樂按鈕 */
         .music-toggle {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 8px;
+            right: 8px;
             background: rgba(0,0,0,0.5);
-            border: 2px solid #f39c12;
+            border: 1px solid #f39c12;
             color: white;
-            font-size: 1.5rem;
-            width: 50px;
-            height: 50px;
+            font-size: 1.2rem;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
@@ -392,6 +364,18 @@
         .music-toggle:hover {
             background: rgba(0,0,0,0.7);
         }
+
+        /* iPad 適配 */
+        @media (max-width: 1024px) {
+            #start-screen h1 { font-size: 2rem; }
+            #start-screen p { font-size: 0.85rem; }
+            .game-header { font-size: 0.75rem; padding: 6px; }
+            .timer { font-size: 1.1rem; }
+            .player-header h2 { font-size: 1rem; }
+            .character { font-size: 2rem; }
+            .question { font-size: 1rem; }
+            .answer-btn { font-size: 0.8rem; padding: 6px; }
+        }
     </style>
 </head>
 <body>
@@ -401,7 +385,7 @@
     <div id="start-screen" class="screen active">
         <h1>🎮 四則運算大對戰</h1>
         <p>挑戰你的計算能力！</p>
-        <p style="font-size: 1rem; opacity: 0.8;">⏱️ 限時90秒 - 雙人即時對戰 - 先擊敗對手贏得勝利</p>
+        <p style="font-size: 0.8rem; opacity: 0.8;">⏱️ 限時90秒 - 雙人即時對戰</p>
         <button class="btn-primary" onclick="startGame()">⚔️ 開始對戰</button>
     </div>
 
@@ -409,14 +393,14 @@
     <div id="game-screen" class="screen">
         <button class="music-toggle" onclick="toggleMusic()" id="music-btn">🔊</button>
         <div class="game-header">
-            <div>⏱️ 時間: <span id="timer" class="timer">90</span>秒</div>
-            <div>騎士 (P1) - HP: <span id="hp1">100</span> | 分數: <span id="score1">0</span></div>
-            <div>法師 (P2) - HP: <span id="hp2">100</span> | 分數: <span id="score2">0</span></div>
+            <div>⏱️ <span id="timer" class="timer">90</span>秒</div>
+            <div>P1: HP <span id="hp1">100</span> | 分 <span id="score1">0</span></div>
+            <div>P2: HP <span id="hp2">100</span> | 分 <span id="score2">0</span></div>
         </div>
         <div class="game-ui">
             <div class="player-side p1-side" id="p1">
                 <div class="player-header">
-                    <h2>⚔️ 騎士 (P1)</h2>
+                    <h2>⚔️ 騎士</h2>
                 </div>
                 <div class="character" id="char1">🗡️</div>
                 <div class="hp-bar-container">
@@ -428,7 +412,7 @@
             
             <div class="player-side p2-side" id="p2">
                 <div class="player-header">
-                    <h2>🧙 法師 (P2)</h2>
+                    <h2>🧙 法師</h2>
                 </div>
                 <div class="character" id="char2">🪄</div>
                 <div class="hp-bar-container">
@@ -448,13 +432,13 @@
             <div class="end-stats">
                 <div class="vs-section">
                     <div class="player-result">
-                        <h3>⚔️ 騎士 (P1)</h3>
+                        <h3>⚔️ 騎士</h3>
                         <p>HP: <span id="final-hp1">0</span></p>
                         <p>分數: <span id="final-score1">0</span></p>
                         <p>答對: <span id="final-correct1">0</span></p>
                     </div>
                     <div class="player-result">
-                        <h3>🧙 法師 (P2)</h3>
+                        <h3>🧙 法師</h3>
                         <p>HP: <span id="final-hp2">0</span></p>
                         <p>分數: <span id="final-score2">0</span></p>
                         <p>答對: <span id="final-correct2">0</span></p>
@@ -576,30 +560,31 @@
     let musicEnabled = false;
     let gameTimer = null;
 
-    // 創建簡單的遊戲音樂 (8-bit風格)
     function createGameMusic() {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const notes = [262, 294, 330, 349, 392, 440]; // C, D, E, F, G, A
-        
-        const playNote = (freq, duration, time) => {
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-            osc.connect(gain);
-            gain.connect(audioContext.destination);
-            osc.frequency.value = freq;
-            osc.type = 'square';
-            gain.gain.setValueAtTime(0.3, time);
-            gain.gain.exponentialRampToValueAtTime(0.01, time + duration);
-            osc.start(time);
-            osc.stop(time + duration);
-        };
-        
-        let time = audioContext.currentTime;
-        for (let i = 0; i < 20; i++) {
-            const noteIndex = Math.floor(Math.random() * notes.length);
-            playNote(notes[noteIndex], 0.1, time);
-            time += 0.1;
-        }
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const notes = [262, 294, 330, 349, 392, 440];
+            
+            const playNote = (freq, duration, time) => {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+                osc.frequency.value = freq;
+                osc.type = 'square';
+                gain.gain.setValueAtTime(0.3, time);
+                gain.gain.exponentialRampToValueAtTime(0.01, time + duration);
+                osc.start(time);
+                osc.stop(time + duration);
+            };
+            
+            let time = audioContext.currentTime;
+            for (let i = 0; i < 20; i++) {
+                const noteIndex = Math.floor(Math.random() * notes.length);
+                playNote(notes[noteIndex], 0.1, time);
+                time += 0.1;
+            }
+        } catch (e) {}
     }
 
     function toggleMusic() {
@@ -607,11 +592,7 @@
         const btn = document.getElementById('music-btn');
         btn.innerText = musicEnabled ? '🔊' : '🔇';
         if (musicEnabled) {
-            try {
-                createGameMusic();
-            } catch (e) {
-                console.log('音樂播放失敗');
-            }
+            createGameMusic();
         }
     }
 
@@ -621,7 +602,6 @@
         gameActive = true;
         timeRemaining = 90;
         
-        // 開始倒計時
         gameTimer = setInterval(() => {
             timeRemaining--;
             const timerEl = document.getElementById('timer');
@@ -636,11 +616,8 @@
             }
         }, 1000);
         
-        // 播放遊戲音樂
         if (musicEnabled) {
-            try {
-                createGameMusic();
-            } catch (e) {}
+            createGameMusic();
         }
         
         loadQuestion(1);
@@ -695,7 +672,6 @@
             data.score += 50;
             data.correctCount++;
             charEl.classList.add('attack');
-            // 答對不回血，只是增加分數
             otherData.hp = Math.max(0, otherData.hp - 15);
         } else {
             btn.classList.add('wrong');
@@ -723,7 +699,6 @@
         document.getElementById('hp2').innerText = p2Data.hp;
         document.getElementById('score2').innerText = p2Data.score;
         
-        // 更新HP條
         const hpPercent1 = Math.max(0, p1Data.hp) / 100 * 100;
         const hpPercent2 = Math.max(0, p2Data.hp) / 100 * 100;
         document.getElementById('hp-bar1').style.width = hpPercent1 + '%';
