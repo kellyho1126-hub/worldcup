@@ -1,176 +1,106 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>世界盃足球知識問答大賽</title>
+    <title>世界盃足球問答大賽</title>
     <style>
-        body { margin: 0; background: #0A192F; color: white; font-family: sans-serif; height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
-        .screen { display: none; width: 100vw; height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
-        .active { display: flex; }
-        .btn { padding: 15px 30px; margin: 10px; border: none; border-radius: 10px; background: #27ae60; color: white; font-size: 1.2rem; cursor: pointer; transition: 0.3s; }
-        .btn:hover { opacity: 0.8; }
-        .stats { display: flex; justify-content: space-around; width: 100%; margin-bottom: 20px; font-weight: bold; font-size: 1.1rem; }
-        #question { font-size: 1.8rem; margin: 20px; text-align: center; }
-        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; max-width: 600px; }
-        .option-btn { padding: 20px; background: #34495e; border: 2px solid #bdc3c7; border-radius: 10px; color: white; cursor: pointer; transition: 0.3s; }
-        .option-btn:hover { border-color: #27ae60; }
-        .option-btn.selected { border-color: #27ae60; background: #16a085; }
-        #goal-anim { width: 300px; height: 150px; border: 2px solid white; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 10px; background: #000; border-radius: 10px; transition: 0.3s; }
-        #progress { font-size: 1rem; margin-top: 10px; color: #bdc3c7; }
+        body { margin: 0; padding: 0; font-family: 'Arial', sans-serif; background: #004d26; color: white; overflow: hidden; touch-action: manipulation; }
+        #game-container { width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .screen { display: none; width: 100%; height: 100%; }
+        .active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .stats { display: flex; gap: 20px; font-size: 1.2rem; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; }
+        #animation-area { height: 30vh; display: flex; align-items: center; justify-content: center; font-size: 5rem; margin: 20px 0; }
+        .button { padding: 15px 30px; margin: 10px; background: #ffcc00; border: none; border-radius: 10px; cursor: pointer; font-size: 1.2rem; font-weight: bold; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 80%; }
     </style>
 </head>
 <body>
 
-<div id="start-screen" class="screen active">
-    <h1>⚽ 世界盃足球知識問答大賽</h1>
-    <p style="font-size: 1.1rem; margin: 20px;">挑戰30道題目，看你能獲得多少獎金！</p>
-    <button class="btn" onclick="startGame()">開始遊戲</button>
-</div>
+<div id="game-container">
+    <!-- 開始畫面 -->
+    <div id="start-screen" class="screen active">
+        <h1>⚽ 世界盃足球問答大賽</h1>
+        <button class="button" onclick="startGame()">開始遊戲</button>
+    </div>
 
-<div id="game-screen" class="screen">
-    <div class="stats">
-        <span>金額: $<span id="money">0</span></span>
-        <span>Combo: <span id="combo">0</span></span>
-        <span>等級: <span id="rank">菜鳥觀眾</span></span>
+    <!-- 遊戲畫面 -->
+    <div id="game-screen" class="screen">
+        <div class="stats">
+            <span id="player-lvl">等級: 觀眾</span>
+            <span id="player-money">金額: $0</span>
+            <span id="player-combo">Combo: 0</span>
+        </div>
+        <div id="animation-area">👧⚽🥅🧤</div>
+        <div id="question-area" style="font-size: 1.5rem; margin: 20px;">題目內容...</div>
+        <div class="options" id="options-area"></div>
+        <div style="margin-top: 20px;">
+            <button class="button" onclick="submitAnswer()">確定</button>
+            <button class="button" onclick="useHint()">小錦囊</button>
+        </div>
     </div>
-    <div id="goal-anim">等待射門...</div>
-    <div id="question"></div>
-    <div class="options" id="options"></div>
-    <div id="progress"></div>
-    <div style="margin-top:20px;">
-        <button class="btn" onclick="cancelSelection()">取消</button>
-        <button class="btn" onclick="confirmAnswer()" style="background:#2980b9">確定</button>
-        <button class="btn" onclick="useHint()" style="background:#f39c12">小錦囊</button>
-    </div>
-</div>
-
-<div id="end-screen" class="screen">
-    <h1>🏆 挑戰完成！</h1>
-    <div style="font-size: 1.5rem; margin: 30px;">
-        <p>最終金額: <span style="color: #f39c12;">$<span id="final-money">0</span></span></p>
-        <p>最高Combo: <span style="color: #27ae60;"><span id="final-combo">0</span></span></p>
-        <p>最終等級: <span style="color: #3498db;"><span id="final-rank">菜鳥觀眾</span></span></p>
-    </div>
-    <button class="btn" onclick="location.reload()">再來一次</button>
 </div>
 
 <script>
     const questions = [
-        { q: "世界盃足球賽每 ___ 年舉辦一次？", a: ["2", "4", "6", "8"], c: 1 },
-        { q: "每隊同時在場上的球員人數為 ___ 人？", a: ["9", "10", "11", "12"], c: 2 },
-        { q: "2022年世界盃冠軍是？", a: ["法國", "阿根廷", "巴西", "德國"], c: 1 },
-        { q: "被稱為『球王』並帶領阿根廷奪冠的是？", a: ["比利", "馬拉度納", "梅西", "C羅"], c: 2 },
-        { q: "獲得世界盃進球最多的獎項是？", a: ["金靴獎", "金球獎", "銀靴獎", "大力神盃"], c: 0 },
-        { q: "足球場上，只有 ___ 可以用手觸球？", a: ["隊長", "守門員", "裁判", "前鋒"], c: 1 },
-        { q: "第一屆世界盃是在 ___ 年舉辦的？", a: ["1920", "1930", "1940", "1950"], c: 1 },
-        { q: "在禁區內犯規，裁判會判罰？", a: ["角球", "任意球", "十二碼", "罰球"], c: 2 },
-        { q: "歷史上奪冠次數最多的國家是？", a: ["德國", "巴西", "義大利", "阿根廷"], c: 1 },
-        { q: "2026年世界盃由三個國家舉辦，除了美、加還有？", a: ["墨西哥", "巴西", "日本", "英國"], c: 0 },
-        { q: "哪位球員獲得過最多次金球獎？", a: ["C羅", "梅西", "內馬爾", "姆巴佩"], c: 1 },
-        { q: "被稱為『老虎』的荷蘭足球大師是？", a: ["克魯伊夫", "範佩西", "范德薩", "斯內德"], c: 0 },
-        { q: "足球比賽中，角球是由誰發出的？", a: ["任何球員", "守門員", "任意球位置的球員", "防守隊員"], c: 2 },
-        { q: "現役足球運動員中，哪個國家的陣容最強？", a: ["法國", "阿根廷", "巴西", "西班牙"], c: 2 },
-        { q: "最多人觀看的體育賽事是？", a: ["奧運會", "世界盃足球", "温布頓網球", "美式足球超級盃"], c: 1 },
-        { q: "英超聯賽一個賽季有 ___ 場比賽？", a: ["30", "34", "38", "42"], c: 2 },
-        { q: "西甲聯賽中，皇家馬德里的主場是？", a: ["聖地牙哥伯納烏", "伯納烏球場", "聖地牙哥球場", "皇馬球場"], c: 0 },
-        { q: "義甲聯賽中，尤文圖斯的別稱是？", a: ["婦女隊", "老婦人", "家族隊", "皮埃蒙特隊"], c: 1 },
-        { q: "德甲聯賽中，拜仁慕尼黑的主場是？", a: ["安聯球場", "西南球場", "奧林匹克球場", "慕尼黑球場"], c: 0 },
-        { q: "法甲聯賽中，巴黎聖日耳曼的主場是？", a: ["王子公園球場", "法蘭西球場", "聖日耳曼球場", "巴黎球場"], c: 0 },
-        { q: "足球運動起源於 ___ 世紀的中國？", a: ["5", "10", "15", "20"], c: 1 },
-        { q: "現代足球的發源地是？", a: ["意大利", "英國", "德國", "法國"], c: 1 },
-        { q: "國際足球聯合會（FIFA）成立於 ___ 年？", a: ["1904", "1908", "1912", "1920"], c: 0 },
-        { q: "足球比賽中，換人次數一般不超過 ___ 次？", a: ["2", "3", "5", "7"], c: 1 },
-        { q: "越位規則的主要目的是？", a: ["增加防守難度", "防止前鋒蓋樓", "鼓勵傳中", "限制進攻方式"], c: 1 },
-        { q: "黃牌表示什麼懲罰？", a: ["警告", "禁賽一場", "直接罰出場", "罰球"], c: 0 },
-        { q: "紅牌表示什麼懲罰？", a: ["警告", "禁賽一場", "直接罰出場", "罰球"], c: 2 },
-        { q: "足球比賽一般由 ___ 名裁判負責執法？", a: ["2", "3", "4", "5"], c: 2 },
-        { q: "門框的寬度是 ___ 米？", a: ["7", "7.32", "8", "8.5"], c: 1 },
-        { q: "禁區距離球門線 ___ 米？", a: ["16", "16.5", "18", "18.32"], c: 3 },
-        { q: "最後一題：足球比賽正規時間是 ___ 分鐘？", a: ["45", "60", "90", "120"], c: 2 }
+        { q: "第一屆世界盃是在 ___ 年舉辦的。", a: ["1930", "1950", "1920", "1940"], correct: 0 },
+        { q: "奪得最多世界盃冠軍的國家是 ___ 。", a: ["巴西", "德國", "阿根廷", "意大利"], correct: 0 },
+        { q: "世界盃決賽週通常每 ___ 年舉辦一次。", a: ["4", "2", "3", "5"], correct: 0 },
+        { q: "球王比利來自 ___ 國家。", a: ["巴西", "阿根廷", "葡萄牙", "法國"], correct: 0 },
+        { q: "___ 被稱為「足球之神」的阿根廷球星。", a: ["馬勒當拿", "美斯", "比利", "C朗"], correct: 0 },
+        { q: "2022年卡塔爾世界盃決賽中，阿根廷擊敗 ___ 奪冠。", a: ["法國", "巴西", "德國", "克羅地亞"], correct: 0 }
     ];
 
-    let money = 0, combo = 0, maxCombo = 0, qIdx = 0, selected = null;
+    let currentIdx = 0, money = 0, combo = 0, selectedAns = null;
 
     function startGame() {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('start-screen').classList.remove('active');
         document.getElementById('game-screen').classList.add('active');
-        loadQuestion();
+        showQuestion();
     }
 
-    function loadQuestion() {
-        if(qIdx >= questions.length) {
-            endGame();
-            return;
-        }
-        selected = null;
-        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-        document.getElementById('goal-anim').innerText = "等待射門...";
-        document.getElementById('question').innerText = questions[qIdx].q;
-        document.getElementById('progress').innerText = `進度: ${qIdx + 1} / ${questions.length}`;
-        const optDiv = document.getElementById('options');
-        optDiv.innerHTML = '';
-        questions[qIdx].a.forEach((opt, i) => {
-            optDiv.innerHTML += `<button class="option-btn" onclick="select(${i})">${opt}</button>`;
+    function showQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('question-area').innerText = q.q;
+        const optArea = document.getElementById('options-area');
+        optArea.innerHTML = '';
+        q.a.forEach((opt, i) => {
+            optArea.innerHTML += `<button class="button" onclick="select(${i})">${opt}</button>`;
         });
     }
 
-    function select(i) {
-        selected = i;
-        document.querySelectorAll('.option-btn').forEach((b, idx) => {
-            b.classList.toggle('selected', idx === i);
-        });
-    }
+    function select(i) { selectedAns = i; }
 
-    function cancelSelection() {
-        selected = null;
-        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-    }
-
-    function confirmAnswer() {
-        if(selected === null) { alert("請選擇一個答案！"); return; }
-        const anim = document.getElementById('goal-anim');
-        if(selected === questions[qIdx].c) {
+    function submitAnswer() {
+        if (selectedAns === null) return alert("請先選擇！");
+        
+        const isCorrect = selectedAns === questions[currentIdx].correct;
+        const anim = document.getElementById('animation-area');
+        
+        if (isCorrect) {
+            anim.innerText = "⚽🥅🎉"; // 入球
             money += 20;
             combo++;
-            if(combo > maxCombo) maxCombo = combo;
-            if(combo >= 3) money += 50;
-            anim.innerText = "⚽ GOAL! 射門成功 ⚽";
-            anim.style.background = "#27ae60";
+            if (combo % 3 === 0) money += 50;
         } else {
-            money -= 10;
+            anim.innerText = "🧤🛑😭"; // 撲出
+            money = Math.max(0, money - 50);
             combo = 0;
-            anim.innerText = "🥅 撲救成功！(錯誤)";
-            anim.style.background = "#c0392b";
-            if(money < 0) money = 0;
         }
-        updateRank();
-        qIdx++;
-        setTimeout(loadQuestion, 1500);
-    }
-
-    function updateRank() {
-        let rank = "菜鳥觀眾";
-        if(qIdx >= 20) rank = "足球評論員";
-        else if(qIdx >= 10) rank = "熱血球迷";
-        document.getElementById('money').innerText = money;
-        document.getElementById('combo').innerText = combo;
-        document.getElementById('rank').innerText = rank;
+        
+        document.getElementById('player-money').innerText = `金額: $${money}`;
+        document.getElementById('player-combo').innerText = `Combo: ${combo}`;
+        
+        setTimeout(() => {
+            currentIdx++;
+            selectedAns = null;
+            if (currentIdx < questions.length) showQuestion();
+            else alert("遊戲結束！最終獎金: $" + money);
+        }, 1500);
     }
 
     function useHint() {
-        alert("小錦囊：正確答案在" + (questions[qIdx].c + 1) + "選項");
-    }
-
-    function endGame() {
-        let finalRank = "菜鳥觀眾";
-        if(qIdx >= 20) finalRank = "足球評論員";
-        else if(qIdx >= 10) finalRank = "熱血球迷";
-        document.getElementById('final-money').innerText = money;
-        document.getElementById('final-combo').innerText = maxCombo;
-        document.getElementById('final-rank').innerText = finalRank;
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('end-screen').classList.add('active');
+        alert("提示：仔細閱讀題目！");
     }
 </script>
 </body>
