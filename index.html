@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>世界盃足球知識問答大賽</title>
+    <style>
+        body { margin: 0; font-family: sans-serif; background: #2c3e50; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        #game-container { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; }
+        .btn { padding: 15px 30px; margin: 10px; border: none; border-radius: 10px; background: #27ae60; color: white; font-size: 1.2rem; cursor: pointer; }
+        .stats { display: flex; justify-content: space-between; width: 100%; font-size: 1.2rem; margin-bottom: 20px; }
+        #question { font-size: 1.5rem; margin-bottom: 20px; text-align: center; }
+        .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+        .option-btn { padding: 20px; background: #34495e; border: 2px solid #bdc3c7; border-radius: 10px; color: white; cursor: pointer; }
+        .option-btn.selected { background: #f39c12; border-color: #f39c12; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="screen-start">
+        <h1>世界盃足球問答</h1>
+        <button class="btn" onclick="startGame()">開始遊戲</button>
+    </div>
+    <div id="screen-game" style="display:none;">
+        <div class="stats">
+            <span>金額: $<span id="money">100</span></span>
+            <span>Combo: <span id="combo">0</span></span>
+        </div>
+        <div id="question"></div>
+        <div class="options" id="options"></div>
+        <button class="btn" onclick="confirmAnswer()">確定</button>
+        <button class="btn" onclick="useHint()">小錦囊</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "世界盃足球賽每 ___ 年舉辦一次？", a: ["4", "2", "6", "8"], correct: 0 },
+        { q: "足球場上，每隊有多少名球員同時在場上？", a: ["11", "9", "10", "12"], correct: 0 },
+        { q: "進球後，負責守門的球員被稱為 ___？", a: ["門將", "前鋒", "中場", "後衛"], correct: 0 },
+        { q: "世界盃冠軍獎盃被稱為 ___？", a: ["大力神盃", "金靴獎", "金球獎", "歐冠盃"], correct: 0 },
+        { q: "足球賽中，球員用手觸球會被判 ___？", a: ["手球犯規", "越位", "角球", "發球"], correct: 0 },
+        { q: "哪位球員被譽為『球王』，曾帶領阿根廷奪冠？", a: ["馬拉度納", "比利", "梅西", "C羅"], correct: 0 }
+    ];
+
+    let money = 100, combo = 0, currentQ = 0, selected = null;
+
+    function startGame() {
+        document.getElementById('screen-start').style.display = 'none';
+        document.getElementById('screen-game').style.display = 'flex';
+        showQuestion();
+    }
+
+    function showQuestion() {
+        selected = null;
+        const q = questions[currentQ];
+        document.getElementById('question').innerText = q.q;
+        const optDiv = document.getElementById('options');
+        optDiv.innerHTML = '';
+        q.a.forEach((opt, i) => {
+            optDiv.innerHTML += `<button class="option-btn" onclick="select(${i})">${opt}</button>`;
+        });
+    }
+
+    function select(index) {
+        selected = index;
+        document.querySelectorAll('.option-btn').forEach((btn, i) => {
+            btn.classList.toggle('selected', i === index);
+        });
+    }
+
+    function confirmAnswer() {
+        if(selected === null) { alert("請選擇一個答案！"); return; }
+        if(selected === questions[currentQ].correct) {
+            money += 20;
+            combo++;
+            if(combo >= 3) money += 50;
+            alert("✓ 回答正確！");
+        } else {
+            money -= 10;
+            combo = 0;
+            alert("✗ 回答錯誤！");
+        }
+        document.getElementById('money').innerText = money;
+        document.getElementById('combo').innerText = combo;
+        currentQ++;
+        if(money <= 0 || currentQ >= questions.length) {
+            alert("遊戲結束！最終金額: $" + money);
+            location.reload();
+        } else {
+            showQuestion();
+        }
+    }
+
+    function useHint() {
+        alert("小錦囊功能開發中...");
+    }
+</script>
+</body>
+</html>
