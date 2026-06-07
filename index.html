@@ -10,9 +10,15 @@
         .screen { display: none; width: 100%; height: 100%; }
         .active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .stats { display: flex; gap: 20px; font-size: 1.2rem; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; }
+        #progress { font-size: 1rem; margin-top: 10px; }
         #animation-area { height: 30vh; display: flex; align-items: center; justify-content: center; font-size: 5rem; margin: 20px 0; }
-        .button { padding: 15px 30px; margin: 10px; background: #ffcc00; border: none; border-radius: 10px; cursor: pointer; font-size: 1.2rem; font-weight: bold; }
+        .button { padding: 15px 30px; margin: 10px; background: #ffcc00; border: none; border-radius: 10px; cursor: pointer; font-size: 1.2rem; font-weight: bold; color: #004d26; }
+        .button:hover { background: #e6b800; }
         .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 80%; }
+        #end-screen { background: linear-gradient(135deg, #004d26, #1a8c3d); }
+        .end-content { text-align: center; }
+        .end-content h1 { font-size: 3rem; margin-bottom: 30px; }
+        .end-content p { font-size: 1.5rem; margin: 15px 0; }
     </style>
 </head>
 <body>
@@ -21,22 +27,33 @@
     <!-- 開始畫面 -->
     <div id="start-screen" class="screen active">
         <h1>⚽ 世界盃足球問答大賽</h1>
+        <p style="font-size: 1.3rem; margin: 20px;">答對所有30題問題</p>
         <button class="button" onclick="startGame()">開始遊戲</button>
     </div>
 
     <!-- 遊戲畫面 -->
     <div id="game-screen" class="screen">
         <div class="stats">
-            <span id="player-lvl">等級: 觀眾</span>
             <span id="player-money">金額: $0</span>
             <span id="player-combo">Combo: 0</span>
         </div>
+        <div id="progress">第 <span id="current-q">1</span> / 30 題</div>
         <div id="animation-area">👧⚽🥅🧤</div>
         <div id="question-area" style="font-size: 1.5rem; margin: 20px;">題目內容...</div>
         <div class="options" id="options-area"></div>
         <div style="margin-top: 20px;">
             <button class="button" onclick="submitAnswer()">確定</button>
             <button class="button" onclick="useHint()">小錦囊</button>
+        </div>
+    </div>
+
+    <!-- 結束畫面 -->
+    <div id="end-screen" class="screen">
+        <div class="end-content">
+            <h1>🎉 遊戲結束！</h1>
+            <p>最終獎金: <span id="final-money" style="color: #ffcc00; font-size: 2rem;">$0</span></p>
+            <p>總連擊數: <span id="final-combo" style="color: #ffcc00;">0</span></p>
+            <button class="button" onclick="location.reload()" style="margin-top: 30px;">重新開始</button>
         </div>
     </div>
 </div>
@@ -48,10 +65,34 @@
         { q: "世界盃決賽週通常每 ___ 年舉辦一次。", a: ["4", "2", "3", "5"], correct: 0 },
         { q: "球王比利來自 ___ 國家。", a: ["巴西", "阿根廷", "葡萄牙", "法國"], correct: 0 },
         { q: "___ 被稱為「足球之神」的阿根廷球星。", a: ["馬勒當拿", "美斯", "比利", "C朗"], correct: 0 },
-        { q: "2022年卡塔爾世界盃決賽中，阿根廷擊敗 ___ 奪冠。", a: ["法國", "巴西", "德國", "克羅地亞"], correct: 0 }
+        { q: "2022年卡塔爾世界盃決賽中，阿根廷擊敗 ___ 奪冠。", a: ["法國", "巴西", "德國", "克羅地亞"], correct: 0 },
+        { q: "德國足球傳奇球星貝肯鮑爾的綽號是 ___ 。", a: ["皇帝", "國王", "王子", "將軍"], correct: 0 },
+        { q: "義大利贏得過 ___ 次世界盃冠軍。", a: ["4", "3", "2", "5"], correct: 1 },
+        { q: "2010年南非世界盃冠軍是 ___ 。", a: ["西班牙", "荷蘭", "德國", "意大利"], correct: 0 },
+        { q: "2014年巴西世界盃冠軍是 ___ 。", a: ["德國", "巴西", "阿根廷", "荷蘭"], correct: 0 },
+        { q: "法國贏得過 ___ 次世界盃冠軍。", a: ["2", "1", "3", "0"], correct: 2 },
+        { q: "1994年美國世界盃冠軍是 ___ 。", a: ["巴西", "意大利", "德國", "法國"], correct: 0 },
+        { q: "2018年俄羅斯世界盃冠軍是 ___ 。", a: ["法國", "克羅地亞", "比利時", "英格蘭"], correct: 0 },
+        { q: "英超聯賽被譽為世界上最 ___ 的足球聯賽。", a: ["具競爭力", "最富有", "最古老", "最多觀眾"], correct: 0 },
+        { q: "克里斯蒂亞諾·羅納爾多來自 ___ 國家。", a: ["葡萄牙", "西班牙", "巴西", "烏拉圭"], correct: 0 },
+        { q: "里奧·美西獲得過 ___ 次FIFA世界足球先生。", a: ["7", "5", "6", "8"], correct: 0 },
+        { q: "世界盃歷史上進球最多的球隊是 ___ 。", a: ["巴西", "德國", "法國", "意大利"], correct: 0 },
+        { q: "足球比賽的標準時間是 ___ 分鐘。", a: ["90", "80", "100", "120"], correct: 0 },
+        { q: "一支足球隊在球場上有 ___ 名球員。", a: ["11", "10", "12", "9"], correct: 0 },
+        { q: "2002年韓日世界盃冠軍是 ___ 。", a: ["巴西", "德國", "韓國", "日本"], correct: 0 },
+        { q: "烏拉圭贏得過 ___ 次世界盃冠軍。", a: ["2", "1", "3", "0"], correct: 0 },
+        { q: "1998年法國世界盃東道主是 ___ 。", a: ["法國", "英格蘭", "義大利", "西班牙"], correct: 0 },
+        { q: "梅西效力過的最著名球隊是 ___ 。", a: ["巴塞隆那", "皇家馬德里", "尤文圖斯", "曼聯"], correct: 0 },
+        { q: "世界盃金球獎通常頒發給 ___ 。", a: ["最佳球員", "最佳射手", "最佳門將", "最佳後衛"], correct: 0 },
+        { q: "荷蘭國家隊三次進入世界盃決賽但從未贏得冠軍，這發生在哪三年？(其中之一)", a: ["1974", "1962", "1986", "2000"], correct: 0 },
+        { q: "英格蘭贏得過 ___ 次世界盃冠軍。", a: ["1", "2", "0", "3"], correct: 0 },
+        { q: "2006年德國世界盃冠軍是 ___ 。", a: ["意大利", "法國", "德國", "巴西"], correct: 0 },
+        { q: "阿根廷球星馬拉多納在 ___ 年的世界盃上帶領球隊奪冠。", a: ["1986", "1978", "1990", "2006"], correct: 0 },
+        { q: "世界盃比賽中，紅牌表示 ___ 。", a: ["直接罰下場", "警告", "犯規", "任意球"], correct: 0 },
+        { q: "足球運動的發源地是 ___ 。", a: ["英格蘭", "蘇格蘭", "義大利", "西班牙"], correct: 0 }
     ];
 
-    let currentIdx = 0, money = 0, combo = 0, selectedAns = null;
+    let currentIdx = 0, money = 0, combo = 0, selectedAns = null, hintsUsed = 0;
 
     function startGame() {
         document.getElementById('start-screen').classList.remove('active');
@@ -62,14 +103,21 @@
     function showQuestion() {
         const q = questions[currentIdx];
         document.getElementById('question-area').innerText = q.q;
+        document.getElementById('current-q').innerText = currentIdx + 1;
         const optArea = document.getElementById('options-area');
         optArea.innerHTML = '';
+        selectedAns = null;
         q.a.forEach((opt, i) => {
             optArea.innerHTML += `<button class="button" onclick="select(${i})">${opt}</button>`;
         });
     }
 
-    function select(i) { selectedAns = i; }
+    function select(i) { 
+        selectedAns = i;
+        document.querySelectorAll('.options .button').forEach((btn, idx) => {
+            btn.style.background = idx === i ? '#ff9900' : '#ffcc00';
+        });
+    }
 
     function submitAnswer() {
         if (selectedAns === null) return alert("請先選擇！");
@@ -94,13 +142,24 @@
         setTimeout(() => {
             currentIdx++;
             selectedAns = null;
-            if (currentIdx < questions.length) showQuestion();
-            else alert("遊戲結束！最終獎金: $" + money);
+            if (currentIdx < questions.length) {
+                showQuestion();
+            } else {
+                endGame();
+            }
         }, 1500);
     }
 
+    function endGame() {
+        document.getElementById('game-screen').classList.remove('active');
+        document.getElementById('end-screen').classList.add('active');
+        document.getElementById('final-money').innerText = '$' + money;
+        document.getElementById('final-combo').innerText = combo;
+    }
+
     function useHint() {
-        alert("提示：仔細閱讀題目！");
+        hintsUsed++;
+        alert(`提示 #${hintsUsed}: 仔細閱讀題目！`);
     }
 </script>
 </body>
