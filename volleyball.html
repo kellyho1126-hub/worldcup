@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>排球奧運知識大賽</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            font-family: 'Arial', sans-serif; 
+            text-align: center; 
+            overflow: hidden;
+            min-height: 100vh;
+        }
+        #game-container { 
+            width: 100vw; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center;
+        }
+        .screen { 
+            display: none; 
+            width: 100%; 
+            height: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .active { display: flex !important; }
+        
+        /* 開始畫面 */
+        #start-screen {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        #start-screen h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        #start-screen p {
+            font-size: 1.3rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        /* 遊戲畫面 */
+        #quiz-screen {
+            background: #2c3e50;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-top: 20px;
+        }
+        
+        .stats { 
+            display: flex; 
+            justify-content: space-around; 
+            width: 100%; 
+            padding: 15px; 
+            background: rgba(0,0,0,0.5);
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        
+        .stats span {
+            color: #f39c12;
+            font-weight: bold;
+        }
+        
+        #progress {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            opacity: 0.8;
+        }
+        
+        #canvas-anim { 
+            width: 100%; 
+            height: 150px; 
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            border-bottom: 3px solid white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: bounce 0.6s ease-in-out;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        #question {
+            font-size: 1.5rem;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        
+        #options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            width: 80%;
+            margin: 20px auto;
+        }
+        
+        .btn { 
+            padding: 15px 30px; 
+            margin: 10px; 
+            border: none; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-size: 1rem;
+            font-weight: bold;
+            background: #e74c3c; 
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+        
+        .btn.selected {
+            background: #f39c12;
+            box-shadow: 0 0 10px #f39c12;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .btn-confirm {
+            background: #27ae60;
+        }
+        
+        .btn-confirm:hover {
+            background: #229954;
+        }
+        
+        .btn-cancel {
+            background: #95a5a6;
+        }
+        
+        .btn-cancel:hover {
+            background: #7f8c8d;
+        }
+        
+        .hidden { display: none !important; }
+        
+        /* 結束畫面 */
+        #end-screen {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .end-content {
+            text-align: center;
+        }
+        
+        .end-content h1 {
+            font-size: 3rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .end-content p {
+            font-size: 1.5rem;
+            margin: 15px 0;
+            line-height: 2;
+        }
+        
+        .end-stats {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            width: 80%;
+        }
+        
+        .end-stats span {
+            color: #f39c12;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .rank-badge {
+            font-size: 2rem;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <!-- 開始畫面 -->
+    <div id="start-screen" class="screen active">
+        <h1>🏐 排球奧運知識大賽</h1>
+        <p>挑戰你對排球的了解！</p>
+        <p style="font-size: 1rem; opacity: 0.7;">答對所有30題問題</p>
+        <button class="btn" onclick="startGame()" style="background: #f39c12; font-size: 1.3rem; padding: 20px 40px;">開始遊戲</button>
+    </div>
+
+    <!-- 遊戲畫面 -->
+    <div id="quiz-screen" class="screen">
+        <div class="stats">
+            <div>💰 金額: $<span id="score">0</span></div>
+            <div>🔥 Combo: <span id="combo">0</span></div>
+            <div>⭐ 等級: <span id="rank">觀眾</span></div>
+        </div>
+        <div id="progress">第 <span id="current-q">1</span> / 30 題</div>
+        <div id="canvas-anim">🏐🏐🏐</div>
+        <h3 id="question">題目載入中...</h3>
+        <div id="options"></div>
+        <div class="action-buttons">
+            <button class="btn btn-confirm" onclick="confirmAnswer()">✓ 確定</button>
+            <button class="btn btn-cancel" onclick="resetSelection()">✕ 取消</button>
+        </div>
+    </div>
+
+    <!-- 結束畫面 -->
+    <div id="end-screen" class="screen">
+        <div class="end-content">
+            <h1>🎉 遊戲結束！</h1>
+            <div class="end-stats">
+                <p>最終獎金: <span id="final-score">$0</span></p>
+                <p>總連擊數: <span id="final-combo">0</span></p>
+                <p>答對題數: <span id="correct-count">0</span> / 30</p>
+            </div>
+            <div class="rank-badge">
+                等級: <span id="final-rank">觀眾</span>
+            </div>
+            <button class="btn" onclick="location.reload()" style="background: #f39c12; font-size: 1.1rem; padding: 15px 40px; margin-top: 20px;">🔄 重新開始</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const questions = [
+    {q: "排球比賽中，每一方在球網的每一邊最多可以擊球 ___ 次。", a: ["3", "2", "4", "5"], correct: 0},
+    {q: "奧運排球比賽中，通常採取 ___ 制。", a: ["五局三勝", "三局二勝", "七局四勝", "一局決勝"], correct: 1},
+    {q: "排球網的高度（男子）是 ___ 米。", a: ["2.43", "2.24", "2.50", "2.30"], correct: 0},
+    {q: "排球網的高度（女子）是 ___ 米。", a: ["2.24", "2.43", "2.20", "2.10"], correct: 0},
+    {q: "排球隊伍中每隊有 ___ 名球員。", a: ["6", "7", "5", "8"], correct: 0},
+    {q: "排球得分制中，一局的獲勝分數是達到 ___ 分。", a: ["25", "21", "30", "20"], correct: 0},
+    {q: "排球中，發球隊員必須站在 ___ 線後。", a: ["底線", "中線", "邊線", "進攻線"], correct: 0},
+    {q: "排球運動起源於 ___ 國家。", a: ["美國", "日本", "中國", "巴西"], correct: 0},
+    {q: "排球的英文名稱是 ___ 。", a: ["Volleyball", "Ball Game", "Net Ball", "Spike Ball"], correct: 0},
+    {q: "奧運排球首次舉辦是在 ___ 年。", a: ["1964", "1972", "1956", "1948"], correct: 0},
+    {q: "排球中，完成進攻的動作稱為 ___ 。", a: ["扣球", "傳球", "發球", "攔網"], correct: 0},
+    {q: "排球中，用手臂防守稱為 ___ 。", a: ["墊球", "傳球", "扣球", "發球"], correct: 0},
+    {q: "排球比賽中，換邊通常在 ___ 進行。", a: ["每局結束", "每5分", "每10分", "比賽中場"], correct: 0},
+    {q: "排球進攻線距離球網的距離是 ___ 米。", a: ["3", "4", "2", "5"], correct: 0},
+    {q: "排球中，一個完整的進攻動作包括接球、傳球和 ___ 。", a: ["扣球", "發球", "攔網", "墊球"], correct: 0},
+    {q: "中國女子排球隊在 ___ 年首次獲得奧運冠軍。", a: ["1984", "1992", "1976", "1988"], correct: 0},
+    {q: "排球比賽中，被攔網的球稱為 ___ 。", a: ["死球", "活球", "發球", "過網球"], correct: 0},
+    {q: "排球運動員的標準跳躍高度通常在 ___ 厘米以上。", a: ["50", "30", "40", "60"], correct: 0},
+    {q: "排球中，接發球的隊員稱為 ___ 。", a: ["自由人", "舉球員", "主攻手", "副攻手"], correct: 0},
+    {q: "排球比賽超過決勝局，通常採取 ___ 分先得制。", a: ["15", "25", "20", "10"], correct: 0},
+    {q: "排球中，負責傳球給主攻手的球員是 ___ 。", a: ["舉球員", "自由人", "主攻手", "副攻手"], correct: 0},
+    {q: "排球比賽中，每隊可以申請 ___ 次暫停。", a: ["2", "3", "1", "4"], correct: 0},
+    {q: "排球運動中，擊球的最高點稱為 ___ 。", a: ["扣球點", "發球點", "接球點", "傳球點"], correct: 0},
+    {q: "排球中，從後排進行的進攻稱為 ___ 。", a: ["後攻", "前攻", "邊攻", "中攻"], correct: 0},
+    {q: "排球比賽中，連續得分的隊伍獲得 ___ 權。", a: ["發球", "進攻", "防守", "換邊"], correct: 0},
+    {q: "排球運動的核心技能不包括以下哪一個？", a: ["投籃", "發球", "傳球", "扣球"], correct: 0},
+    {q: "排球中，球越過球網但落在對方界內稱為 ___ 。", a: ["得分", "犯規", "界外", "重發"], correct: 0},
+    {q: "排球比賽中，一個隊伍最多可以連續擊球 ___ 次。", a: ["3", "4", "2", "5"], correct: 0},
+    {q: "排球運動中，女子球隊通常有 ___ 名主攻手。", a: ["2", "3", "1", "4"], correct: 0},
+    {q: "排球國際比賽的最高監管機構是 ___ 。", a: ["國際排球聯合會", "國際體育委員會", "奧委會", "世界體育聯盟"], correct: 0}
+];
+
+let score = 0, combo = 0, correctCount = 0, currentQ = 0, selected = null;
+
+function startGame() {
+    document.getElementById('start-screen').classList.remove('active');
+    document.getElementById('quiz-screen').classList.add('active');
+    renderQuestion();
+}
+
+function renderQuestion() {
+    const qData = questions[currentQ];
+    document.getElementById('question').innerText = qData.q;
+    document.getElementById('current-q').innerText = currentQ + 1;
+    const optDiv = document.getElementById('options');
+    optDiv.innerHTML = '';
+    selected = null;
+    qData.a.forEach((opt, idx) => {
+        optDiv.innerHTML += `<button class="btn" onclick="select(${idx})">${opt}</button>`;
+    });
+}
+
+function select(idx) { 
+    selected = idx;
+    document.querySelectorAll('#options .btn').forEach((btn, i) => {
+        if (i === idx) btn.classList.add('selected');
+        else btn.classList.remove('selected');
+    });
+}
+
+function resetSelection() { 
+    selected = null;
+    document.querySelectorAll('#options .btn').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+}
+
+function confirmAnswer() {
+    if (selected === null) return alert("請先選擇答案！");
+    
+    const isCorrect = selected === questions[currentQ].correct;
+    const anim = document.getElementById('canvas-anim');
+    
+    if (isCorrect) {
+        anim.innerText = "🏐 ⚡ 🎉";
+        score += 20 + (combo >= 2 ? 10 : 0);
+        combo++;
+        correctCount++;
+    } else {
+        anim.innerText = "🏐 ❌ 😞";
+        score = Math.max(0, score - 50);
+        if (combo >= 2) score = Math.max(0, score - 20);
+        combo = 0;
+    }
+    
+    updateUI();
+    
+    setTimeout(() => {
+        currentQ++;
+        if (currentQ < 30) renderQuestion();
+        else endGame();
+    }, 1500);
+}
+
+function updateUI() {
+    document.getElementById('score').innerText = score;
+    document.getElementById('combo').innerText = combo;
+    
+    let rank = "觀眾";
+    if (correctCount >= 25) rank = "排球傳奇";
+    else if (correctCount >= 20) rank = "排球大師";
+    else if (correctCount >= 15) rank = "資深排球迷";
+    else if (correctCount >= 10) rank = "排球愛好者";
+    else if (correctCount >= 5) rank = "初級排球迷";
+    
+    document.getElementById('rank').innerText = rank;
+}
+
+function endGame() {
+    let finalRank = "觀眾";
+    if (correctCount >= 25) finalRank = "排球傳奇 🏆";
+    else if (correctCount >= 20) finalRank = "排球大師 ⭐";
+    else if (correctCount >= 15) finalRank = "資深排球迷 👑";
+    else if (correctCount >= 10) finalRank = "排球愛好者 💪";
+    else if (correctCount >= 5) finalRank = "初級排球迷 📚";
+    
+    document.getElementById('quiz-screen').classList.remove('active');
+    document.getElementById('end-screen').classList.add('active');
+    document.getElementById('final-score').innerText = '$' + score;
+    document.getElementById('final-combo').innerText = combo;
+    document.getElementById('correct-count').innerText = correctCount;
+    document.getElementById('final-rank').innerText = finalRank;
+}
+</script>
+</body>
+</html>
